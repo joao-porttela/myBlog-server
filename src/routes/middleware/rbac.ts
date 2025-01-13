@@ -4,7 +4,7 @@ import jwt, {Secret} from "jsonwebtoken";
 import {getRole} from "../../helper/role.js";
 
 import {Role} from "../../interfaces/enum/Role.js";
-import {prismaUsersRepository} from "../../04/database/repository/prisma.users.respository.js";
+import {prismaUserRepository} from "../../04/database/repository/users.respository.js";
 
 export const PRIVATE_KEY: Secret = process.env.PRIVATE_KEY!;
 
@@ -30,7 +30,7 @@ export async function RBAC(
   const id: string = (<{sub: string}>decoded).sub;
 
   // 3) Check if user still exists
-  const currentUser = await prismaUsersRepository.findById(id);
+  const currentUser = await prismaUserRepository.findById(id);
 
   if (!currentUser)
     return res.json({

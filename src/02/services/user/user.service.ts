@@ -1,14 +1,22 @@
 // DOMAIN
 import {User} from "../../../01/entities/user.entity.js"; // Entity
 
-// Interface
-import {CreateUser} from "../../../interfaces/dtos/create-user.dto.js";
+// Interfaces
+import {IUserService} from "../../../interfaces/services/user/userService.interface.js";
 
-export class UserService {
-  constructor() {}
+// Types
+import {IUser} from "../../../types/entities/user.type.js";
 
-  async create(user: CreateUser): Promise<User> {
-    return new User(user.id, user.name, user.email, user.role);
+export class UserService implements IUserService {
+  async create(user: IUser): Promise<User> {
+    return new User(
+      user.id,
+      user.name,
+      user.email,
+      user.role,
+      user.createdAt,
+      user.updatedAt || undefined
+    );
   }
 }
 

@@ -2,25 +2,30 @@ import {Request} from "express";
 import * as bcrypt from "bcrypt";
 
 // DI
-import {AuthService, authService} from "../../../02/services/auth/auth.service.js";
-import {UserService, userService} from "../../../02/services/user/user.service.js";
-import {
-  PrismaUsersRepository,
-  prismaUsersRepository,
-} from "../../../04/database/repository/prisma.users.respository.js";
+import {authService} from "../../../02/services/auth/auth.service.js";
+import {userService} from "../../../02/services/user/user.service.js";
+import {userRepository} from "../../../04/database/repository/users.respository.js";
 
 // DTO
-import {CreatePrismaUser} from "../../../interfaces/dtos/create-prisma-user.dto.js";
+import {CreatePrismaUserDTO} from "../../../types/dtos/user/create-prisma-user.dto.js";
+
+// Interfaces
+import {IUserRepository} from "../../../interfaces/repo/user/user-repository.interface.js";
+
+import {IAuthController} from "../../../interfaces/controllers/auth/authController.interface.js";
+
+import {IAuthService} from "../../../interfaces/services/auth/authService.interface.js";
+import {IUserService} from "../../../interfaces/services/user/userService.interface.js";
 
 // Type
 import {ResponseType} from "../../../types/response.type.js";
 import {Role} from "../../../interfaces/enum/Role.js";
 import {getRole} from "../../../helper/role.js";
 
-export class AuthController {
-  private authService: AuthService = authService;
-  private userService: UserService = userService;
-  private prismaRepository: PrismaUsersRepository = prismaUsersRepository;
+export class AuthController implements IAuthController {
+  private authService: IAuthService = authService;
+  private userService: IUserService = userService;
+  private userRepository: IUserRepository = userRepository;
 
   public async signUp(req: Request): Promise<ResponseType> {
     const hashedPassword = await bcrypt.hash(String(req.body.password), 10);
@@ -45,7 +50,7 @@ export class AuthController {
       };
 
     // createUser object
-    const createUser: CreatePrismaUser = {
+    const createUser: CreatePrismaUserDTO = {
       email: req.body.email,
       username: req.body.username,
       password: hashedPassword,
@@ -53,7 +58,7 @@ export class AuthController {
     };
 
     // Get user from DB
-    const userDb = await this.prismaRepository.create(createUser);
+    const userDb = await this.userRepository.create(createUser);
 
     // If no userDb we return a message saying that something went wrong.
     // It was not able to sign up user
@@ -71,6 +76,8 @@ export class AuthController {
       name: userDb.username,
       email: userDb.email,
       role: userDb.role === "ADMIN" ? Role[Role.ADMIN] : Role[Role.USER],
+      createdAt: userDb.createdAt,
+      updatedAt: userDb.updatedAt || undefined,
     });
 
     // Generate user payload
@@ -90,7 +97,7 @@ export class AuthController {
   public async login(req: Request): Promise<ResponseType> {
     try {
       // Find db user
-      const userDb = await this.prismaRepository.findByEmail(req.body.email);
+      const userDb = await this.userRepository.findByEmail(req.body.email);
 
       if (!userDb)
         return {
@@ -117,6 +124,8 @@ export class AuthController {
         name: userDb.username,
         email: userDb.email,
         role: userDb.role === "ADMIN" ? Role[Role.ADMIN] : Role[Role.USER],
+        createdAt: userDb.createdAt,
+        updatedAt: userDb.updatedAt || undefined,
       });
 
       // Generate user payload

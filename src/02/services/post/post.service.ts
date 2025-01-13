@@ -2,24 +2,27 @@
 import {Post} from "../../../01/entities/post.entity.js"; // Entity
 
 // Interface
-import {CreatePost} from "../../../interfaces/dtos/create-post.dto.js";
+import {IPostService} from "../../../interfaces/services/posts/postService.interface.js";
 
-export class PostService {
-  constructor() {}
+// Types
+import {IPost} from "../../../types/entities/post.type.js";
 
-  async create(post: CreatePost): Promise<Post> {
+export class PostService implements IPostService {
+  async create(post: IPost): Promise<IPost> {
     return new Post(
       post.id,
+      post.slug,
       post.title,
-      post.content,
-      post.author,
+      post.authorId,
       post.published,
+      post.createdAt,
+      post.content,
       post.updatedAt,
       post.tags,
-      post.categories,
-      post.subCategory
+      post.categoryId,
+      post.subCategoryId
     );
   }
 }
 
-export const userService = new PostService();
+export const postService = new PostService();

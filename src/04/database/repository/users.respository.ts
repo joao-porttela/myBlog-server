@@ -8,25 +8,25 @@
 import {Prisma} from "../prisma.client.js";
 
 // Interface
-import {IPrismaUsersRepository} from "../../../interfaces/prisma-user-repository.interface.js";
+import {IUserRepository} from "../../../interfaces/repo/user/user-repository.interface.js";
 
 // Infrastructure
 import {User} from "@prisma/client"; // User Model
 
 // DTO
-import {CreatePrismaUser} from "../../../interfaces/dtos/create-prisma-user.dto.js";
+import {CreatePrismaUserDTO} from "../../../types/dtos/user/create-prisma-user.dto.js";
 
-export class PrismaUsersRepository implements IPrismaUsersRepository {
+export class UserRepository implements IUserRepository {
   constructor(private readonly prisma: typeof Prisma) {}
 
-  async create(createUser: CreatePrismaUser): Promise<User | null> {
+  async create(createUser: CreatePrismaUserDTO): Promise<User | null> {
     const userDb = await this.prisma.user
       .create({
         data: {
           email: createUser.email,
           password: createUser.password,
           username: createUser.username,
-          role: createUser.role,
+          role: createUser.role ? createUser.role : "USER",
         },
       })
       .catch((err: Error) => {
@@ -93,4 +93,4 @@ export class PrismaUsersRepository implements IPrismaUsersRepository {
   }
 }
 
-export const prismaUsersRepository = new PrismaUsersRepository(Prisma);
+export const userRepository = new UserRepository(Prisma);

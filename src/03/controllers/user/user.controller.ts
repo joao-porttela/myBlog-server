@@ -2,22 +2,24 @@ import {Request} from "express";
 
 // DI
 import {UserService, userService} from "../../../02/services/user/user.service.js";
-import {
-  PrismaUsersRepository,
-  prismaUsersRepository,
-} from "../../../04/database/repository/prisma.users.respository.js";
+import {userRepository} from "../../../04/database/repository/users.respository.js";
+
+// Interfaces
+import {IUserRepository} from "../../../interfaces/repo/user/user-repository.interface.js";
+
+import {IUserController} from "../../../interfaces/controllers/user/userController.interface.js";
 
 // Type
 import {ResponseType} from "../../../types/response.type.js";
 import {Role} from "../../../interfaces/enum/Role.js";
 
-export class UserController {
+export class UserController implements IUserController {
   private userService: UserService = userService;
-  private prismaRepository: PrismaUsersRepository = prismaUsersRepository;
+  private userRepository: IUserRepository = userRepository;
 
   public async findUserById(req: Request): Promise<ResponseType> {
     // Find db user
-    const userDb = await this.prismaRepository.findById(req.body.id);
+    const userDb = await this.userRepository.findById(req.body.id);
 
     if (!userDb)
       return {
@@ -33,6 +35,8 @@ export class UserController {
       name: userDb.username,
       email: userDb.email,
       role: userDb.role === "ADMIN" ? Role[Role.ADMIN] : Role[Role.USER],
+      createdAt: userDb.createdAt,
+      updatedAt: userDb.updatedAt || undefined,
     });
 
     return {
@@ -44,7 +48,7 @@ export class UserController {
   }
 
   public async getUsers(): Promise<ResponseType> {
-    const usersDb = await this.prismaRepository.getAll();
+    const usersDb = await this.userRepository.getAll();
 
     return {
       statusCode: 200,
@@ -55,7 +59,7 @@ export class UserController {
   }
 
   public async deleteUser(req: Request): Promise<ResponseType> {
-    const message = await this.prismaRepository.deleteUser(req.body.id);
+    const message = await this.userRepository.deleteUser(req.body.id);
 
     return {
       statusCode: 200,

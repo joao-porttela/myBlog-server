@@ -1,10 +1,12 @@
-import {IUser} from "../../interfaces/user.interface.js";
+import {IUser} from "../../types/entities/user.type.js";
 
 export class User implements IUser {
   constructor(
     public readonly id: string,
     public name: string,
     public email: string,
-    public readonly role: string
+    public readonly role: string,
+    public readonly createdAt: Date,
+    public readonly updatedAt?: Date
   ) {}
 }

@@ -1,12 +1,15 @@
 import jwt from "jsonwebtoken";
-import {User} from "../../01/entities/user.entity.js";
+
+// Interfaces
+import {IAuthService} from "../../../interfaces/services/auth/authService.interface.js";
+
+// Types
+import {IUser} from "../../../types/entities/user.type.js";
 
 const key = process.env.PRIVATE_KEY;
 
-export class AuthService {
-  constructor() {}
-
-  public async generateToken(id: string, user: User): Promise<string> {
+export class AuthService implements IAuthService {
+  public async generateToken(id: string, user: IUser): Promise<string> {
     const payload = {user, sub: id};
 
     if (!key) return "error";

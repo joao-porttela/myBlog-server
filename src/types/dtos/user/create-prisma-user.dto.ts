@@ -1,6 +1,6 @@
-export type CreatePrismaUser = {
+export type CreatePrismaUserDTO = {
   email: string;
   username: string;
   password: string;
-  role: string;
+  role?: string;
 };
