@@ -3,12 +3,15 @@ import {Router} from "express";
 // Controllers
 import {UserController} from "../../03/controllers/user/user.controller.js";
 
-// Types
-import {ResponseType} from "../../types/response.type.js";
-import {RBAC} from "../middleware/rbac.js";
-import {Role} from "../../interfaces/enum/Role.js";
+// Interfaces
+import {IUserController} from "../../struct/interfaces/controllers/user/userController.interface.js";
 
-const userController = new UserController();
+// Types
+import {ResponseType} from "../../struct/types/response.type.js";
+import {RBAC} from "../middleware/rbac.js";
+import {Role} from "../../struct/interfaces/enum/Role.js";
+
+const userController: IUserController = new UserController();
 
 const usersRouter: Router = Router();
 

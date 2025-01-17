@@ -8,5 +8,5 @@ export type CreatePostDTO = {
   authorId: string;
   categoryId: string | null;
   subCategoryId: string | null;
-  tags: ITag[];
+  tags: string[] | [];
 };

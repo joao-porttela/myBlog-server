@@ -1,4 +1,4 @@
-import {Role} from "../interfaces/enum/Role.js";
+import {Role} from "../struct/interfaces/enum/Role.js";
 
 export function getRole(role: string): string | "Not Authorised" {
   if (!role || role.length === 0) return Role[Role.USER];

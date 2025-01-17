@@ -5,13 +5,13 @@ import {UserService, userService} from "../../../02/services/user/user.service.j
 import {userRepository} from "../../../04/database/repository/users.respository.js";
 
 // Interfaces
-import {IUserRepository} from "../../../interfaces/repo/user/user-repository.interface.js";
+import {IUserRepository} from "../../../struct/interfaces/repo/user/user-repository.interface.js";
 
-import {IUserController} from "../../../interfaces/controllers/user/userController.interface.js";
+import {IUserController} from "../../../struct/interfaces/controllers/user/userController.interface.js";
 
 // Type
-import {ResponseType} from "../../../types/response.type.js";
-import {Role} from "../../../interfaces/enum/Role.js";
+import {ResponseType} from "../../../struct/types/response.type.js";
+import {Role} from "../../../struct/interfaces/enum/Role.js";
 
 export class UserController implements IUserController {
   private userService: UserService = userService;

@@ -8,13 +8,13 @@
 import {Prisma} from "../prisma.client.js";
 
 // Interface
-import {IUserRepository} from "../../../interfaces/repo/user/user-repository.interface.js";
+import {IUserRepository} from "../../../struct/interfaces/repo/user/user-repository.interface.js";
 
 // Infrastructure
 import {User} from "@prisma/client"; // User Model
 
 // DTO
-import {CreatePrismaUserDTO} from "../../../types/dtos/user/create-prisma-user.dto.js";
+import {CreatePrismaUserDTO} from "../../../struct/types/dtos/user/create-prisma-user.dto.js";
 
 export class UserRepository implements IUserRepository {
   constructor(private readonly prisma: typeof Prisma) {}
@@ -30,7 +30,7 @@ export class UserRepository implements IUserRepository {
         },
       })
       .catch((err: Error) => {
-        console.log(err);
+        console.log(`USER REPOSITORY CREATE | ERROR: ${err}`);
 
         return null;
       });
@@ -68,14 +68,6 @@ export class UserRepository implements IUserRepository {
         where: {email},
       })
       .catch(() => null);
-
-    if (!userDb) return null;
-
-    return userDb;
-  }
-
-  async findByUsername(username: string): Promise<User | null> {
-    const userDb = await this.prisma.user.findUnique({where: {username}});
 
     if (!userDb) return null;
 

@@ -7,19 +7,19 @@ import {userService} from "../../../02/services/user/user.service.js";
 import {userRepository} from "../../../04/database/repository/users.respository.js";
 
 // DTO
-import {CreatePrismaUserDTO} from "../../../types/dtos/user/create-prisma-user.dto.js";
+import {CreatePrismaUserDTO} from "../../../struct/types/dtos/user/create-prisma-user.dto.js";
 
 // Interfaces
-import {IUserRepository} from "../../../interfaces/repo/user/user-repository.interface.js";
+import {IUserRepository} from "../../../struct/interfaces/repo/user/user-repository.interface.js";
 
-import {IAuthController} from "../../../interfaces/controllers/auth/authController.interface.js";
+import {IAuthController} from "../../../struct/interfaces/controllers/auth/authController.interface.js";
 
-import {IAuthService} from "../../../interfaces/services/auth/authService.interface.js";
-import {IUserService} from "../../../interfaces/services/user/userService.interface.js";
+import {IAuthService} from "../../../struct/interfaces/services/auth/authService.interface.js";
+import {IUserService} from "../../../struct/interfaces/services/user/userService.interface.js";
 
 // Type
-import {ResponseType} from "../../../types/response.type.js";
-import {Role} from "../../../interfaces/enum/Role.js";
+import {ResponseType} from "../../../struct/types/response.type.js";
+import {Role} from "../../../struct/interfaces/enum/Role.js";
 import {getRole} from "../../../helper/role.js";
 
 export class AuthController implements IAuthController {
@@ -28,70 +28,81 @@ export class AuthController implements IAuthController {
   private userRepository: IUserRepository = userRepository;
 
   public async signUp(req: Request): Promise<ResponseType> {
-    const hashedPassword = await bcrypt.hash(String(req.body.password), 10);
-    const isValidEmailFormat = this.authService.validateEmail(req.body.email);
+    try {
+      const hashedPassword = await bcrypt.hash(String(req.body.password), 10);
+      const isValidEmailFormat = this.authService.validateEmail(req.body.email);
 
-    if (!isValidEmailFormat)
-      return {
-        statusCode: 400,
-        status: "Fail",
-        message: "Invalid email format",
-        error: true,
+      if (!isValidEmailFormat)
+        return {
+          statusCode: 400,
+          status: "Fail",
+          message: "Invalid email format",
+          error: true,
+        };
+
+      const role: string | "Not Authorised" = getRole(req.body.role);
+
+      if (role === "Not Authorised")
+        return {
+          statusCode: 400,
+          status: "Fail",
+          message: role,
+          error: true,
+        };
+
+      // createUser object
+      const createUser: CreatePrismaUserDTO = {
+        email: req.body.email,
+        username: req.body.username,
+        password: hashedPassword,
+        role: role,
       };
 
-    const role: string | "Not Authorised" = getRole(req.body.role);
+      // Get user from DB
+      const userDb = await this.userRepository.create(createUser);
 
-    if (role === "Not Authorised")
+      // If no userDb we return a message saying that something went wrong.
+      // It was not able to sign up user
+      if (!userDb)
+        return {
+          statusCode: 500,
+          status: "Fail",
+          message: "Something went wrong!",
+          error: true,
+        };
+
+      // Create User Entity using userService
+      const user = await this.userService.create({
+        id: userDb.id,
+        name: userDb.username,
+        email: userDb.email,
+        role: userDb.role === "ADMIN" ? Role[Role.ADMIN] : Role[Role.USER],
+        createdAt: userDb.createdAt,
+        updatedAt: userDb.updatedAt || undefined,
+      });
+
+      // Generate user payload
+      const payload = await this.authService.generateToken(user.id, user);
+
       return {
-        statusCode: 400,
-        status: "Fail",
-        message: role,
-        error: true,
+        statusCode: 200,
+        status: "Success",
+        message: {
+          user,
+          payload,
+        },
+        error: false,
       };
+    } catch (error) {
+      console.log(`AUTH CONTROLLER | SIGN UP ERROR: ${error}`);
 
-    // createUser object
-    const createUser: CreatePrismaUserDTO = {
-      email: req.body.email,
-      username: req.body.username,
-      password: hashedPassword,
-      role: role,
-    };
-
-    // Get user from DB
-    const userDb = await this.userRepository.create(createUser);
-
-    // If no userDb we return a message saying that something went wrong.
-    // It was not able to sign up user
-    if (!userDb)
       return {
         statusCode: 500,
         status: "Fail",
-        message: "Something went wrong!",
+        message: "Internal Server Error",
         error: true,
       };
-
-    // Create User Entity using userService
-    const user = await this.userService.create({
-      id: userDb.id,
-      name: userDb.username,
-      email: userDb.email,
-      role: userDb.role === "ADMIN" ? Role[Role.ADMIN] : Role[Role.USER],
-      createdAt: userDb.createdAt,
-      updatedAt: userDb.updatedAt || undefined,
-    });
-
-    // Generate user payload
-    const payload = await this.authService.generateToken(user.id, user);
-
-    return {
-      statusCode: 200,
-      status: "Success",
-      message: {
-        user,
-        payload,
-      },
-      error: false,
-    };
+    }
   }
 
   public async login(req: Request): Promise<ResponseType> {
@@ -140,14 +151,14 @@ export class AuthController implements IAuthController {
         },
         error: false,
       };
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(`AUTH CONTROLLER | LOGIN ERROR: ${error}`);
 
       return {
-        statusCode: 200,
-        status: "Success",
-        message: err,
-        error: false,
+        statusCode: 500,
+        status: "Fail",
+        message: "Internal Server Error",
+        error: true,
       };
     }
   }

@@ -1,4 +1,4 @@
-import {IUser} from "../../types/entities/user.type.js";
+import {IUser} from "../../struct/types/entities/user.type.js";
 
 export class User implements IUser {
   constructor(

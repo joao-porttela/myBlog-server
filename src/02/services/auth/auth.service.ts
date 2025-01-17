@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
 
 // Interfaces
-import {IAuthService} from "../../../interfaces/services/auth/authService.interface.js";
+import {IAuthService} from "../../../struct/interfaces/services/auth/authService.interface.js";
 
 // Types
-import {IUser} from "../../../types/entities/user.type.js";
+import {IUser} from "../../../struct/types/entities/user.type.js";
 
 const key = process.env.PRIVATE_KEY;
 

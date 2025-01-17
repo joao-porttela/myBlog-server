@@ -3,10 +3,13 @@ import {Router} from "express";
 // Controllers
 import {AuthController} from "../../03/controllers/auth/auth.controller.js";
 
-// Types
-import {ResponseType} from "../../types/response.type.js";
+// Interfaces
+import {IAuthController} from "../../struct/interfaces/controllers/auth/authController.interface.js";
 
-const authController = new AuthController();
+// Types
+import {ResponseType} from "../../struct/types/response.type.js";
+
+const authController: IAuthController = new AuthController();
 
 const authRouter: Router = Router();
 

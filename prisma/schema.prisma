@@ -31,12 +31,11 @@ model Category {
   name      String
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
-  userId    String
-  postId    String
 
-  authorId    User          @relation(fields: [userId], references: [id])
-  posts       Post[]
-  subCategory SubCategory[]
+  authorId      String
+  author        User          @relation(fields: [authorId], references: [id])
+  posts         Post[]
+  subCategories SubCategory[]
 
   @@index([name])
   @@map("categories")
@@ -47,11 +46,11 @@ model SubCategory {
   name      String
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
-  userId    String
 
-  authorId   User     @relation(fields: [userId], references: [id])
-  category   Category @relation(fields: [categoryId], references: [id])
+  authorId   String
   categoryId String
+  author     User     @relation(fields: [authorId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
   posts      Post[]
 
   @@index([name])
@@ -67,14 +66,13 @@ model Post {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
-  author      User         @relation(fields: [authorId], references: [id])
-  category    Category?    @relation(fields: [categoryId], references: [id])
-  subCategory SubCategory? @relation(fields: [subCategoryId], references: [id])
-  tags        Tag[]        @relation("post_tag")
-
   authorId      String
   categoryId    String?
   subCategoryId String?
+  author        User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category      Category?    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  subCategory   SubCategory? @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  tags          Tag[]        @relation("post_tag")
 
   @@index([title])
   @@map("posts")

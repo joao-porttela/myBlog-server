@@ -2,10 +2,10 @@
 import {User} from "../../../01/entities/user.entity.js"; // Entity
 
 // Interfaces
-import {IUserService} from "../../../interfaces/services/user/userService.interface.js";
+import {IUserService} from "../../../struct/interfaces/services/user/userService.interface.js";
 
 // Types
-import {IUser} from "../../../types/entities/user.type.js";
+import {IUser} from "../../../struct/types/entities/user.type.js";
 
 export class UserService implements IUserService {
   async create(user: IUser): Promise<User> {

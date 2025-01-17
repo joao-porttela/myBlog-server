@@ -1,4 +1,3 @@
-import cors from "cors";
 import {App} from "../../app.js";
 import "dotenv/config";
 
@@ -9,10 +8,3 @@ const app =
   new App().server.listen(port, () => console.log(`Running server on port: ${port}`));
 
 if (process.env.NODE_ENV !== "production") (globalThis as any).app = app;
-
-// app.use(
-//   cors({
-//     origin: "http://localhost:3000",
-//     optionsSuccessStatus: 200,
-//   })
-// );
