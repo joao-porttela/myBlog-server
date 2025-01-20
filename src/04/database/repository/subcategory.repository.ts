@@ -2,6 +2,7 @@ import {Prisma} from "../prisma.client.js";
 import {SubCategory} from "@prisma/client";
 
 import {ISubCategoryRepository} from "../../../struct/interfaces/repo/posts/subCategory-repository.interface.js";
+import {UpdateSubCategoryDTO} from "../../../struct/types/dtos/post/update-sub-category.dto.js";
 
 export class SubCategoryRepository implements ISubCategoryRepository {
   constructor(private readonly prisma: typeof Prisma) {}
@@ -22,7 +23,7 @@ export class SubCategoryRepository implements ISubCategoryRepository {
 
       return subCategoryDb;
     } catch (error) {
-      console.error(`SUB CATEGORY CREATE | ERROR: ${error}`);
+      console.error(`SUB CATEGORY | CREATE ERROR: ${error}`);
 
       return null;
     }
@@ -40,7 +41,7 @@ export class SubCategoryRepository implements ISubCategoryRepository {
 
       return subCategoryDb;
     } catch (error) {
-      console.error(`SUB CATEGORY FIND BY ID | ERROR: ${error}`);
+      console.error(`SUB CATEGORY | FIND BY ID ERROR: ${error}`);
 
       return null;
     }
@@ -57,7 +58,41 @@ export class SubCategoryRepository implements ISubCategoryRepository {
 
       return subCategoryDb;
     } catch (error) {
-      console.error(`SUB CATEGORY | ERROR: ${error}`);
+      console.error(`SUB CATEGORY | FIND ERROR: ${error}`);
+
+      return null;
+    }
+  }
+
+  async update(id: string, updateSubCategory: UpdateSubCategoryDTO): Promise<null> {
+    try {
+      await this.prisma.subCategory.update({
+        where: {
+          id,
+        },
+        data: {
+          name: updateSubCategory.name,
+          updatedAt: new Date(),
+        },
+      });
+
+      return null;
+    } catch (error) {
+      console.error(`SUB CATEGORY | UPDATE ERROR: ${error}`);
+
+      return null;
+    }
+  }
+
+  async delete(id: string): Promise<null> {
+    try {
+      await this.prisma.subCategory.delete({
+        where: {id},
+      });
+
+      return null;
+    } catch (error) {
+      console.error(`SUB CATEGORY | DELETE ERROR: ${error}`);
 
       return null;
     }

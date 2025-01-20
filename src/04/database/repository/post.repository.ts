@@ -6,7 +6,7 @@ import {IPostRepository} from "../../../struct/interfaces/repo/posts/post-reposi
 
 // DTO
 import {CreatePostDTO} from "../../../struct/types/dtos/post/create-post.dto.js";
-import {IUpdatePost} from "../../../struct/types/dtos/post/update-post.js";
+import {IUpdatePost} from "../../../struct/types/dtos/post/update-post.dto.js";
 
 export class PostRepository implements IPostRepository {
   constructor(private readonly prisma: typeof Prisma) {}
@@ -55,16 +55,59 @@ export class PostRepository implements IPostRepository {
     }
   }
 
-  async getUserPosts(authorId: string): Promise<Post[] | null> {
+  async getUserPosts(data: {
+    authorId: string;
+    categoryId?: string;
+    subCategoryId?: string;
+  }): Promise<Post[] | null> {
     try {
-      const postDb = await this.prisma.post.findMany({
-        where: {
-          authorId,
-        },
-        include: {
-          tags: true,
-        },
-      });
+      let postDb = null;
+
+      if (data.categoryId != undefined) {
+        postDb = await this.prisma.post.findMany({
+          where: {
+            authorId: data.authorId,
+            categoryId: data.categoryId,
+          },
+          include: {
+            category: true,
+            tags: true,
+          },
+          orderBy: {
+            title: "asc",
+          },
+        });
+      }
+
+      if (data.subCategoryId != undefined) {
+        postDb = await this.prisma.post.findMany({
+          where: {
+            authorId: data.authorId,
+            subCategoryId: data.subCategoryId,
+          },
+          include: {
+            subCategory: true,
+            tags: true,
+          },
+          orderBy: {
+            title: "asc",
+          },
+        });
+      }
+
+      if (!data.categoryId && !data.subCategoryId) {
+        postDb = await this.prisma.post.findMany({
+          where: {
+            authorId: data.authorId,
+          },
+          include: {
+            tags: true,
+          },
+          orderBy: {
+            title: "asc",
+          },
+        });
+      }
 
       return postDb;
     } catch (err) {
@@ -75,30 +118,27 @@ export class PostRepository implements IPostRepository {
 
   async update(id: string, updatedPost: IUpdatePost) {
     try {
-      await this.prisma.post
-        .update({
-          data: {
-            slug: updatedPost.slug,
-            title: updatedPost.title,
-            content: updatedPost.content,
-            published: updatedPost.published,
-            categoryId: updatedPost.categoryId || null,
-            subCategoryId: updatedPost.subCategoryId || null,
-            tags: {
-              connect: updatedPost.tags.map((tag) => ({id: tag})),
-            },
+      await this.prisma.post.update({
+        data: {
+          slug: updatedPost.slug,
+          title: updatedPost.title,
+          content: updatedPost.content,
+          published: updatedPost.published,
+          categoryId: updatedPost.categoryId || null,
+          subCategoryId: updatedPost.subCategoryId || null,
+          tags: {
+            connect: updatedPost.tags.map((tag) => ({id: tag})),
           },
-          where: {
-            id,
-          },
-        })
-        .catch((err) => {
-          throw new Error(err);
-        });
+          updatedAt: new Date(),
+        },
+        where: {
+          id,
+        },
+      });
 
       return null;
     } catch (error) {
-      console.log(`POST REPOSITORY | UPDATE ERROR: ${error}`);
+      console.error(`POST REPOSITORY | UPDATE ERROR: ${error}`);
       return null;
     }
   }
@@ -107,7 +147,7 @@ export class PostRepository implements IPostRepository {
     try {
       await this.prisma.post.delete({
         where: {id},
-      })
+      });
 
       return null;
     } catch (error) {

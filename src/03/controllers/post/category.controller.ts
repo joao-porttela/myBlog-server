@@ -5,9 +5,12 @@ import {ResponseType} from "../../../struct/types/response.type.js";
 
 // Repos
 import {categoryRepository} from "../../../04/database/repository/category.repository.js";
+
+// Interfaces
+import {ICategoryController} from "../../../struct/interfaces/controllers/posts/categoryController.interface.js";
 import {ICategoryRepository} from "../../../struct/interfaces/repo/posts/category-repository.interface.js";
 
-export class CategoryController {
+export class CategoryController implements ICategoryController {
   private readonly categoryRepository: ICategoryRepository = categoryRepository;
 
   public async create(req: Request): Promise<ResponseType> {
@@ -94,6 +97,52 @@ export class CategoryController {
         statusCode: 500,
         status: "Fail",
         message: "Internal Server Error",
+        error: true,
+      };
+    }
+  }
+
+  public async updateCategory(req: Request): Promise<ResponseType> {
+    try {
+      if (!req.body.id || !req.body.category) throw new Error();
+
+      await this.categoryRepository.update(req.body.id, req.body.category);
+
+      return {
+        statusCode: 200,
+        status: "Success",
+        message: "Category updated successfully",
+        error: false,
+      };
+    } catch (error) {
+      console.error(`CATEGORY CONTROLLER | DELETE ERROR: ${error}`);
+      return {
+        statusCode: 500,
+        status: "Fail",
+        message: "Internal server error.",
+        error: true,
+      };
+    }
+  }
+
+  public async deleteCategory(req: Request): Promise<ResponseType> {
+    try {
+      if (!req.body.id) throw new Error();
+
+      await this.categoryRepository.delete(req.body.id);
+
+      return {
+        statusCode: 200,
+        status: "Success",
+        message: "Category deleted successfully",
+        error: false,
+      };
+    } catch (error) {
+      console.error(`CATEGORY CONTROLLER | DELETE ERROR: ${error}`);
+      return {
+        statusCode: 500,
+        status: "Fail",
+        message: "Internal server error.",
         error: true,
       };
     }

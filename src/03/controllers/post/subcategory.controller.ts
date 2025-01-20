@@ -5,11 +5,12 @@ import {subCategoryRepository} from "../../../04/database/repository/subcategory
 
 // Interfaces
 import {ISubCategoryRepository} from "../../../struct/interfaces/repo/posts/subCategory-repository.interface.js";
+import {ISubCategoryController} from "../../../struct/interfaces/controllers/posts/subCategoryController.interface.js";
 
 // Types
 import {ResponseType} from "../../../struct/types/response.type.js";
 
-export class SubCategoryController {
+export class SubCategoryController implements ISubCategoryController {
   private readonly subCategoryRepository: ISubCategoryRepository = subCategoryRepository;
 
   public async create(req: Request): Promise<ResponseType> {
@@ -35,7 +36,7 @@ export class SubCategoryController {
         error: false,
       };
     } catch (error) {
-      console.error(`SUB CATEGORY CONTROLLER CREATE | ERROR: ${error}`);
+      console.error(`SUB CATEGORY CONTROLLER | CREATE ERROR: ${error}`);
 
       return {
         statusCode: 500,
@@ -64,7 +65,7 @@ export class SubCategoryController {
         error: false,
       };
     } catch (error) {
-      console.error(`SUB CATEGORY CONTROLLER FIND MANY BY AUTHOR ID | ERROR: ${error}`);
+      console.error(`SUB CATEGORY CONTROLLER | FIND MANY BY AUTHOR ID ERROR: ${error}`);
 
       return {
         statusCode: 500,
@@ -93,6 +94,53 @@ export class SubCategoryController {
       };
     } catch (error) {
       console.error(`SUB CATEGORY CONTROLLER FIND BY ID | ERROR: ${error}`);
+
+      return {
+        statusCode: 500,
+        status: "Fail",
+        message: "Internal Server Error",
+        error: true,
+      };
+    }
+  }
+
+  public async update(req: Request): Promise<ResponseType> {
+    try {
+      if (!req.body.id || !req.body.subCategory) throw new Error();
+
+      await this.subCategoryRepository.update(req.body.id, req.body.subCategory);
+
+      return {
+        statusCode: 200,
+        status: "Success",
+        message: "Sub Category updated successfully",
+        error: false,
+      };
+    } catch (error) {
+      console.error(`SUB CATEGORY CONTROLLER | DELETE ERROR: ${error}`);
+
+      return {
+        statusCode: 500,
+        status: "Fail",
+        message: "Internal Server Error",
+        error: true,
+      };
+    }
+  }
+
+  public async delete(req: Request): Promise<ResponseType> {
+    try {
+      if (!req.body.id) throw new Error();
+      await this.subCategoryRepository.delete(req.body.id);
+
+      return {
+        statusCode: 200,
+        status: "Success",
+        message: "Sub Category delete successfully",
+        error: false,
+      };
+    } catch (error) {
+      console.error(`SUB CATEGORY CONTROLLER | DELETE ERROR: ${error}`);
 
       return {
         statusCode: 500,

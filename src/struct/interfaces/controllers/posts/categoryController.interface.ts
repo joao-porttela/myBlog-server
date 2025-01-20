@@ -4,4 +4,6 @@ export interface ICategoryController {
   create(req: Request): Promise<ResponseType>;
   findManyByAuthorId(req: Request): Promise<ResponseType>;
   findById(req: Request): Promise<ResponseType>;
+  updateCategory(req: Request): Promise<ResponseType>;
+  deleteCategory(req: Request): Promise<ResponseType>;
 }

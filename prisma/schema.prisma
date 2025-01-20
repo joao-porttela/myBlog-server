@@ -33,7 +33,7 @@ model Category {
   updatedAt DateTime? @updatedAt
 
   authorId      String
-  author        User          @relation(fields: [authorId], references: [id])
+  author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
   posts         Post[]
   subCategories SubCategory[]
 
@@ -49,8 +49,8 @@ model SubCategory {
 
   authorId   String
   categoryId String
-  author     User     @relation(fields: [authorId], references: [id])
-  category   Category @relation(fields: [categoryId], references: [id])
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   posts      Post[]
 
   @@index([name])

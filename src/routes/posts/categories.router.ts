@@ -31,4 +31,16 @@ categoriesRouter.post("/get-category", async (req, res): Promise<any> => {
   return res.json(response);
 });
 
+categoriesRouter.patch("/update", async (req, res): Promise<any> => {
+  const response: ResponseType = await categoryController.updateCategory(req);
+
+  return res.json(response);
+});
+
+categoriesRouter.delete("/delete", async (req, res): Promise<any> => {
+  const response: ResponseType = await categoryController.deleteCategory(req);
+
+  return res.json(response);
+});
+
 export {categoriesRouter};

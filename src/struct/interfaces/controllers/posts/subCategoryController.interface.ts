@@ -8,4 +8,8 @@ export interface ISubCategoryController {
   findManyByAuthorId(req: Request): Promise<ResponseType>;
 
   findById(req: Request): Promise<ResponseType>;
+
+  update(req: Request): Promise<ResponseType>;
+
+  delete(req: Request): Promise<ResponseType>;
 }

@@ -31,4 +31,16 @@ subCategoriesRouter.post("/get-sub-category", async (req, res): Promise<any> => 
   return res.json(response);
 });
 
+subCategoriesRouter.patch("/update", async (req, res): Promise<any> => {
+  const response: ResponseType = await subCategoryController.update(req);
+
+  return res.json(response);
+});
+
+subCategoriesRouter.delete("/delete", async (req, res): Promise<any> => {
+  const response: ResponseType = await subCategoryController.delete(req);
+
+  return res.json(response);
+});
+
 export {subCategoriesRouter};

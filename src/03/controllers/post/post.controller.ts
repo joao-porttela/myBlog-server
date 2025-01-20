@@ -20,7 +20,7 @@ import {ResponseType} from "../../../struct/types/response.type.js";
 // DTO
 import {CreatePostDTO} from "../../../struct/types/dtos/post/create-post.dto.js";
 import {ITag} from "../../../struct/types/entities/tag.type.js";
-import {IUpdatePost} from "../../../struct/types/dtos/post/update-post.js";
+import {IUpdatePost} from "../../../struct/types/dtos/post/update-post.dto.js";
 
 export class PostController implements IPostController {
   private postRepository: IPostRepository = postRepository;
@@ -102,7 +102,7 @@ export class PostController implements IPostController {
         for (const tagName of req.body.tags) {
           const existingTag = await this.tagRepository.find(tagName);
           if (existingTag) {
-            tagIds.push(existingTag.name);
+            tagIds.push(existingTag.id);
           } else {
             const newTag = await this.tagRepository.create({
               name: tagName,
@@ -111,7 +111,7 @@ export class PostController implements IPostController {
 
             if (!newTag) throw new Error();
 
-            tagIds.push(newTag.name);
+            tagIds.push(newTag.id);
           }
         }
       }
@@ -159,7 +159,13 @@ export class PostController implements IPostController {
 
   public async getUserPosts(req: Request): Promise<ResponseType> {
     try {
-      const postsDb = await this.postRepository.getUserPosts(req.body.authorId);
+      const data = {
+        authorId: req.body.authorId,
+        categoryId: req.body.categoryId,
+        subCategoryId: req.body.subCategoryId,
+      };
+
+      const postsDb = await this.postRepository.getUserPosts(data);
 
       return {
         statusCode: 200,
@@ -168,9 +174,7 @@ export class PostController implements IPostController {
         error: false,
       };
     } catch (error) {
-      console.error(
-        "\\x1b[31m'" + `POST CONTROLLER | GET ALL ERROR: ${error}` + "\\x1b[0m"
-      );
+      console.error(`POST CONTROLLER | GET ALL ERROR: ${error}`);
       return {
         statusCode: 500,
         status: "Fail",
@@ -190,7 +194,7 @@ export class PostController implements IPostController {
         error: false,
       };
     } catch (error) {
-      console.error("\\x1b[31m'" + `POST CONTROLLER | GET ERROR: ${error}` + "\\x1b[0m");
+      console.error(`POST CONTROLLER | GET ERROR: ${error}`);
       return {
         statusCode: 500,
         status: "Fail",
@@ -277,7 +281,7 @@ export class PostController implements IPostController {
         for (const tagName of req.body.updatePost.tags) {
           const existingTag = await this.tagRepository.find(tagName);
           if (existingTag) {
-            tagIds.push(existingTag.name);
+            tagIds.push(existingTag.id);
           } else {
             const newTag = await this.tagRepository.create({
               name: tagName,
@@ -286,7 +290,7 @@ export class PostController implements IPostController {
 
             if (!newTag) throw new Error();
 
-            tagIds.push(newTag.name);
+            tagIds.push(newTag.id);
           }
         }
       }
@@ -326,14 +330,12 @@ export class PostController implements IPostController {
 
       return {
         statusCode: 200,
-        status: "Succes",
+        status: "Success",
         message: "Post deleted successfully",
         error: false,
       };
     } catch (error) {
-      console.error(
-        "\\x1b[31m'" + `POST CONTROLLER | DELETE ERROR: ${error}` + "\\x1b[0m"
-      );
+      console.error(`POST CONTROLLER | DELETE ERROR: ${error}`);
       return {
         statusCode: 500,
         status: "Fail",
